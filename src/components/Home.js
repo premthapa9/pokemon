@@ -2,22 +2,25 @@ import React, { useEffect, useState } from "react";
 import { MYAPI } from "../constant";
 import Cards from "./Cards";
 import { MdCatchingPokemon } from "react-icons/md";
+import { useGlobal } from "../context/store";
 
 const Home = () => {
-  const [data, setData] = useState(null);
+  const { data: mydata, loading, iserror, query, setQuery } = useGlobal();
+
   //   const [page, setPage] = useState(1);
+
   const [search, setSearch] = useState("");
   const [fildata, setFildata] = useState(null);
 
-  async function getData() {
-    const res = await fetch(MYAPI + 649);
-    const json = await res.json();
-    if (res.ok) {
-      setData(json);
-      setFildata(json?.results);
-    }
-    // setPage(page + 1);
-  }
+  // async function getData() {
+  //   const res = await fetch(MYAPI + 649);
+  //   const json = await res.json();
+  //   if (res.ok) {
+  //     setData(json);
+  //     setFildata(json?.results);
+  //   }
+  //   // setPage(page + 1);
+  // }
 
   function throttle(cb, limit) {
     let last = 0;
@@ -30,35 +33,43 @@ const Home = () => {
   }
 
   useEffect(() => {
-    if (search) {
-      const filone = data?.results.filter((el, ind) =>
-        el.name.toLowerCase().includes(search.toLowerCase())
+    if (query.length > 0) {
+      const filone = mydata?.results.filter((el, ind) =>
+        el.name.toLowerCase().includes(query.toLowerCase())
       );
       setFildata(filone);
     } else {
-      setFildata(data?.results);
+      setFildata(mydata?.results);
     }
-  }, [search]);
-  const handleScroll = throttle(() => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop + 300 >
-        document.documentElement.offsetHeight &&
-      data?.results.length < 360
-    ) {
-      getData();
-    }
-  }, 800);
+  }, [query, mydata]);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [handleScroll]);
-  useEffect(() => {
-    getData();
+    setFildata(mydata?.results);
   }, []);
-  console.log(data);
+
+  // useEffect(() => {
+  //   setData(items);
+  // }, [items]);
+  // const handleScroll = throttle(() => {
+  //   if (
+  //     window.innerHeight + document.documentElement.scrollTop + 300 >
+  //       document.documentElement.offsetHeight &&
+  //     data?.results.length < 360
+  //   ) {
+  //     getData();
+  //   }
+  // }, 800);
+
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [handleScroll]);
+  // useEffect(() => {
+  //   getData();
+  // }, []);
+  // console.log(myval);
   return (
     <div className="relative">
       <div className="p-3 border-2 fixed top-0 bg-red-800 w-full mb-96">
@@ -71,8 +82,8 @@ const Home = () => {
             type="text"
             placeholder="Enter Pokemon Name"
             className="p-1 outline-none w-64 border-none rounded-md focus:border-sky-100"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
       </div>

@@ -1,14 +1,18 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import { MYAPI } from "../constant";
 
 const myglobal = createContext();
 
 const MyGlobalComp = ({ children }) => {
-  const [alldata, setAlldata] = useState(null);
-  //   const { loading, iserror, data } = useFetch(MYAPI);
+  const [query, setQuery] = useState("");
+  const { loading, iserror, data } = useFetch(MYAPI);
 
-  return <myglobal.Provider value={{}}>{children}</myglobal.Provider>;
+  return (
+    <myglobal.Provider value={{ data, loading, iserror, query, setQuery }}>
+      {children}
+    </myglobal.Provider>
+  );
 };
 
 const useGlobal = () => {
